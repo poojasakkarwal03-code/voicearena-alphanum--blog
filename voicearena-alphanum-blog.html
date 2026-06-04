@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Alphanumeric Problem — VoiceArena</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c0f;
+    --surface: #13131a;
+    --border: #1e1e2a;
+    --accent: #6ee7b7;
+    --accent-dim: rgba(110,231,183,0.08);
+    --accent2: #818cf8;
+    --text: #d4d4e0;
+    --muted: #6b6b80;
+    --highlight: #f0f0fa;
+    --red: #f87171;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --orange: #fb923c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(12,12,15,0.88);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; gap: 2rem; height: 52px;
+  }
+  .nav-logo { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent); letter-spacing: 0.04em; text-decoration: none; }
+  .nav-pill {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    background: var(--accent-dim); color: var(--accent);
+    border: 1px solid rgba(110,231,183,0.2);
+    padding: 3px 10px; border-radius: 20px; letter-spacing: 0.06em;
+  }
+
+  /* HERO */
+  .hero { max-width: 780px; margin: 0 auto; padding: 80px 2rem 60px; border-bottom: 1px solid var(--border); }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 30px;
+  }
+  .hero-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--accent); }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(34px, 5.5vw, 54px);
+    font-weight: 700; line-height: 1.15; color: var(--highlight);
+    margin-bottom: 26px; letter-spacing: -0.015em;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+  .hero-deck { font-size: 19px; color: var(--muted); line-height: 1.7; font-weight: 300; max-width: 660px; margin-bottom: 36px; }
+  .hero-meta { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .meta-chip {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
+    border: 1px solid var(--border); padding: 4px 12px; border-radius: 4px;
+  }
+
+  /* BODY */
+  .body { max-width: 780px; margin: 0 auto; padding: 60px 2rem 100px; }
+  h2 { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--highlight); margin: 64px 0 20px; line-height: 1.25; }
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent);
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px; display: block;
+  }
+  p { color: var(--text); margin-bottom: 22px; }
+  strong { color: var(--highlight); font-weight: 600; }
+
+  /* CODE SPANS */
+  code {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13.5px;
+    background: rgba(110,231,183,0.08); color: var(--accent);
+    border: 1px solid rgba(110,231,183,0.15);
+    padding: 1px 7px; border-radius: 4px;
+  }
+
+  /* STAT ROW */
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 36px 0; }
+  .stat-cell { background: var(--surface); padding: 24px 20px; }
+  .stat-n { font-family: 'IBM Plex Mono', monospace; font-size: 36px; font-weight: 500; line-height: 1; color: var(--highlight); }
+  .stat-n.red { color: var(--red); }
+  .stat-n.green { color: var(--green); }
+  .stat-n.accent { color: var(--accent); }
+  .stat-n.orange { color: var(--orange); }
+  .stat-l { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+  /* QUOTE */
+  .quote {
+    border-left: 2px solid var(--accent);
+    background: var(--accent-dim);
+    border-radius: 0 6px 6px 0;
+    padding: 18px 24px; margin: 28px 0;
+  }
+  .quote p { font-size: 15px; line-height: 1.65; margin-bottom: 8px; color: var(--text); font-style: italic; }
+  .quote p:last-of-type { margin-bottom: 0; }
+  .quote-src { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 12px; font-style: normal; display: block; }
+
+  /* FAILURE TABLE */
+  .ftable-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 32px 0; }
+  .ftable-head { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 18px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 11px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); text-align: left; text-transform: uppercase; letter-spacing: 0.06em; background: var(--surface); border-bottom: 1px solid var(--border); }
+  td { padding: 13px 16px; font-size: 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.018); }
+  .td-code { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--accent); }
+  .td-model { font-weight: 500; color: var(--highlight); font-size: 13.5px; }
+  .td-fail { font-size: 13px; color: var(--text); }
+  .td-num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+
+  /* BADGE */
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; }
+  .badge-bad { background: rgba(248,113,113,0.12); color: var(--red); }
+  .badge-ok { background: rgba(251,191,36,0.1); color: var(--yellow); }
+  .badge-good { background: rgba(74,222,128,0.1); color: var(--green); }
+  .badge-great { background: rgba(110,231,183,0.12); color: var(--accent); }
+
+  /* DELTA BARS */
+  .delta-table { display: flex; flex-direction: column; gap: 10px; margin: 32px 0; }
+  .delta-row { display: grid; grid-template-columns: 200px 80px 80px 1fr; gap: 12px; align-items: center; }
+  .delta-model { font-size: 13px; color: var(--text); }
+  .delta-overall { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); text-align: right; }
+  .delta-hard { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--highlight); text-align: right; }
+  .delta-bar-wrap { height: 22px; background: var(--surface); border-radius: 3px; border: 1px solid var(--border); overflow: hidden; position: relative; }
+  .delta-bar { height: 100%; border-radius: 2px; position: absolute; top: 0; }
+  .delta-bar.pos { background: linear-gradient(90deg, rgba(74,222,128,0.5), rgba(74,222,128,0.2)); }
+  .delta-bar.neg { background: linear-gradient(90deg, rgba(248,113,113,0.6), rgba(248,113,113,0.25)); right: 0; }
+
+  /* CALLOUT */
+  .callout {
+    background: var(--surface); border: 1px solid rgba(110,231,183,0.2);
+    border-radius: 8px; padding: 24px 28px; margin: 36px 0;
+  }
+  .callout-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  .callout p { margin: 0; font-size: 16.5px; color: var(--text); }
+
+  /* FAILURE TYPES GRID */
+  .fail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 32px 0; }
+  .fail-cell { background: var(--surface); padding: 22px; }
+  .fail-count { font-family: 'IBM Plex Mono', monospace; font-size: 26px; color: var(--highlight); margin-bottom: 6px; }
+  .fail-count.red { color: var(--red); }
+  .fail-count.orange { color: var(--orange); }
+  .fail-count.yellow { color: var(--yellow); }
+  .fail-count.accent { color: var(--accent); }
+  .fail-name { font-size: 14px; font-weight: 600; color: var(--highlight); margin-bottom: 6px; }
+  .fail-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .fail-eg { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--accent); margin-top: 8px; line-height: 1.6; }
+
+  /* DIVIDER */
+  .divider { width: 48px; height: 1px; background: var(--border); margin: 52px 0; }
+
+  /* FOOTER */
+  .footer { border-top: 1px solid var(--border); max-width: 780px; margin: 0 auto; padding: 40px 2rem 60px; }
+  .footer-brand { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .footer p { font-size: 14px; color: var(--muted); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  @media (max-width: 620px) {
+    .fail-grid { grid-template-columns: 1fr; }
+    .delta-row { grid-template-columns: 1fr 60px; }
+    .delta-bar-wrap { display: none; }
+    h1 { font-size: 30px; }
+    .hero-deck { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="https://voicearena.com">VoiceArena</a>
+  <span class="nav-pill">Research · June 2026</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Benchmark Analysis</div>
+  <h1>The Alphanumeric Problem:<br><em>TTS Models Break on the Sentences That Matter Most</em></h1>
+  <p class="hero-deck">6,193 human pairwise votes. One finding cuts through all of it: every frontier TTS model struggles when the sentence contains a booking ID, an account number, or an alphanumeric code — exactly the sentences at the core of every commercial deployment.</p>
+  <div class="hero-meta">
+    <span class="meta-chip">VoiceArena · en-US</span>
+    <span class="meta-chip">6,193 votes</span>
+    <span class="meta-chip">7 models</span>
+    <span class="meta-chip">393 alphanumeric complaints</span>
+  </div>
+</div>
+
+<div class="body">
+
+  <p>When TTS researchers benchmark their models, they typically measure naturalness, intelligibility, prosody, and word error rate. What they measure less often is this: <strong>does the model correctly read <code>HVAC-CHI-4351</code> as "H-V-A-C, C-H-I, four-three-five-one" — or does it invent a pronunciation?</strong></p>
+
+  <p>VoiceArena's human evaluation data shows this is not an edge case. It is one of the most consistently documented failure modes across all seven models evaluated, across all four use-case categories, in 393 separate evaluator comments. And it matters more than any other single failure because of where these sentences actually appear: customer support calls, banking confirmations, IVR systems, e-commerce notifications — the high-stakes commercial deployments where TTS is already running at scale.</p>
+
+  <div class="stat-row">
+    <div class="stat-cell">
+      <div class="stat-n red">393</div>
+      <div class="stat-l">human comments flagging alphanumeric or number-reading failures</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-n orange">7 / 7</div>
+      <div class="stat-l">models received at least one alphanumeric complaint</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-n accent">284</div>
+      <div class="stat-l">of 393 failures occurred in Customer Support sentences alone</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-n green">85.6%</div>
+      <div class="stat-l">Gemini's win rate on the hardest alphanumeric sentences — vs. 80.9% overall</div>
+    </div>
+  </div>
+
+  <h2>What VoiceArena Evaluates and Why It Matters Here</h2>
+
+  <p>VoiceArena uses pairwise evaluation: the same sentence is sent to two models, both generate audio, and a human listens to both and selects which one sounds better. This is the same methodology as Chatbot Arena applied to speech — blind, human, head-to-head.</p>
+
+  <p>The evaluation covers four use-case buckets designed to reflect real deployment contexts: Customer Support and Contact Centers, Media and Entertainment, General Conversation and AI Assistants, and Content Creation and Education. The sentences within each bucket are realistic: an IVR reading a booking confirmation, a customer service agent confirming a card number, a public address system announcing a case number.</p>
+
+  <p>These are not synthetic phonetics tests. They are the sentences TTS systems are being asked to read in production today. That is what makes the alphanumeric failure so costly — <strong>it appears in the exact category of sentences that represent the majority of commercial TTS use.</strong></p>
+
+  <h2>Four Ways Models Fail on Alphanumeric Content</h2>
+
+  <p>The 393 evaluator complaints cluster into four distinct failure types. They are not the same problem. Each represents a different breakdown in how models handle structured, non-prose content.</p>
+
+  <div class="fail-grid">
+    <div class="fail-cell">
+      <div class="fail-count red">92</div>
+      <div class="fail-name">Wrong rendering entirely</div>
+      <div class="fail-desc">The model produces a plausible-sounding but incorrect reading — guessing at what the string means rather than rendering it literally.</div>
+      <div class="fail-eg">207 → "two hundred and seven"<br>1422 → "fourteen twenty-two"<br>H12 → "H-one-two" not "H-twelve"</div>
+    </div>
+    <div class="fail-cell">
+      <div class="fail-count orange">73</div>
+      <div class="fail-name">Digit merging</div>
+      <div class="fail-desc">Adjacent digits are read as a combined number rather than individually — the most common failure on credit card and account number strings.</div>
+      <div class="fail-eg">4147-9938 → "forty-one, forty-seven, ninety-nine, thirty-eight"<br>44X2 → "forty four"</div>
+    </div>
+    <div class="fail-cell">
+      <div class="fail-count yellow">42</div>
+      <div class="fail-name">Skipped or dropped content</div>
+      <div class="fail-desc">The model omits a digit, a letter, or an entire segment of the code — producing an incomplete reading the user cannot verify against.</div>
+      <div class="fail-eg">026009593-77K2L9 → first half only<br>APL-RPR-NYC-2991X → dashes skipped entirely</div>
+    </div>
+    <div class="fail-cell">
+      <div class="fail-count accent">32</div>
+      <div class="fail-name">Letters read as words</div>
+      <div class="fail-desc">Letter sequences in codes are interpreted as words or syllables. Hyphens are sometimes spoken aloud as "dash." Models apply word-reading logic to character strings.</div>
+      <div class="fail-eg">CHI → "ki" (not C-H-I)<br>COMP → "comp" (word)<br>BIZ → "biz" (word)<br>dash → spoken as "dash"</div>
+    </div>
+  </div>
+
+  <p>What these four failure types share is a common cause: TTS models are trained overwhelmingly on prose. They learn powerful priors about how number sequences and letter groups behave in ordinary language — "1422" is almost always "fourteen twenty-two" in text, "CHI" is almost always the word it sounds like. In alphanumeric codes, those priors are wrong. The model cannot tell whether it is reading natural language or a structured identifier.</p>
+
+  <h2>The Sentences That Exposed Every Model</h2>
+
+  <p>Eight sentences in the VoiceArena dataset generated the most concentrated alphanumeric feedback — between 10 and 25 evaluator comments each. These are the stress tests. Here is what they contain, and what models did with them.</p>
+
+  <div class="ftable-wrap">
+    <div class="ftable-head">High-Failure Alphanumeric Sentences</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Code in sentence</th>
+          <th>Comments</th>
+          <th>Common failure documented</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-code">COMP-PG-7766</td>
+          <td class="td-num">25</td>
+          <td class="td-fail">"COMP" read as the word "comp" instead of letters C-O-M-P individually</td>
+        </tr>
+        <tr>
+          <td class="td-code">HVAC-CHI-4351</td>
+          <td class="td-num">22</td>
+          <td class="td-fail">"CHI" pronounced as "ki" (phonetic reading); digits merged as "forty-three fifty-one"</td>
+        </tr>
+        <tr>
+          <td class="td-code">1Z999AA10123456784</td>
+          <td class="td-num">16</td>
+          <td class="td-fail">Character-by-character rendering breaks down; nines merged; zero becomes "oh"</td>
+        </tr>
+        <tr>
+          <td class="td-code">USF-LIFE-44X2</td>
+          <td class="td-num">14</td>
+          <td class="td-fail">"LIFE" read as word "lie-ife"; "44" becomes "forty-four" instead of "four, four"</td>
+        </tr>
+        <tr>
+          <td class="td-code">BIZ-NYC-2026-W4-882</td>
+          <td class="td-num">14</td>
+          <td class="td-fail">"BIZ" read as word; hyphens spoken aloud as "dash"; dashes missed entirely</td>
+        </tr>
+        <tr>
+          <td class="td-code">4147-9938-2210-6655</td>
+          <td class="td-num">12</td>
+          <td class="td-fail">Full credit card number merged into pairs: "forty-one, forty-seven, ninety-nine, thirty-eight…"</td>
+        </tr>
+        <tr>
+          <td class="td-code">ZL-7K9M-4492</td>
+          <td class="td-num">12</td>
+          <td class="td-fail">Confirmation code partially skipped; digits combined; dashes vocalised</td>
+        </tr>
+        <tr>
+          <td class="td-code">APL-RPR-NYC-2991X</td>
+          <td class="td-num">10</td>
+          <td class="td-fail">Hyphens spoken as "dash"; letter clusters treated as words; segments dropped</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>These are not obscure or unusual strings. They resemble the identifiers in every contact centre, every e-commerce platform, every banking application. A model that cannot reliably read <code>HVAC-CHI-4351</code> cannot reliably confirm a customer's booking. A model that merges <code>4147-9938-2210-6655</code> into grouped numbers is producing audio a customer cannot verify against their card.</p>
+
+  <div class="quote">
+    <p>"The audio merged the letters CHI in the booking ID together. Instead of saying them individually, as C, H, I, it pronounced them as ki. It also said the numbers together as forty-three fifty-one when they should have also been said individually as four, three, five, one."</p>
+    <p>"The audio is clear and natural sounding. The pace is good. When it says the account number 4147-9938-2210-6655, it combines the numbers together and says 'forty-one, forty-seven, ninety-nine, thirty-eight, twenty-two, ten, sixty-six, fifty-five.' The numbers should be said individually as four, one, four, seven, nine, nine, three, eight, two, two, one, zero, six, six, five, five, for clarity."</p>
+    <p>"'COMP' is said as a word instead of the letters being spoken individually."</p>
+    <span class="quote-src">— Human evaluators, VoiceArena vote log</span>
+  </div>
+
+  <h2>How Each Model Performs on Alphanumeric Sentences</h2>
+
+  <p>The data allows a direct comparison: each model's overall win rate across all 6,193 matchups, versus its win rate on the eight high-alphanumeric sentences specifically. The delta reveals which models are hurt by alphanumeric content and which are not.</p>
+
+  <span class="section-label">Overall Win % vs. Alphanumeric Win % (excluding ties)</span>
+
+  <div class="delta-table">
+    <!-- Gemini: overall 80.9, hard 85.6, delta +4.7 -->
+    <div class="delta-row">
+      <div class="delta-model">Gemini 3.1 Flash TTS</div>
+      <div class="delta-overall">80.9%</div>
+      <div class="delta-hard" style="color: var(--green);">85.6% <span style="font-size:10px; color:var(--green);">▲+4.7</span></div>
+      <div class="delta-bar-wrap"><div class="delta-bar pos" style="width:12%;left:50%;"></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1px;height:100%;background:var(--border);"></div></div>
+    </div>
+    <!-- ElevenLabs: 60.2 → 73.4 +13.2 -->
+    <div class="delta-row">
+      <div class="delta-model">ElevenLabs Eleven v3</div>
+      <div class="delta-overall">60.2%</div>
+      <div class="delta-hard" style="color: var(--green);">73.4% <span style="font-size:10px; color:var(--green);">▲+13.2</span></div>
+      <div class="delta-bar-wrap"><div class="delta-bar pos" style="width:33%;left:50%;"></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1px;height:100%;background:var(--border);"></div></div>
+    </div>
+    <!-- Cartesia: 22.0 → 41.2 +19.2 -->
+    <div class="delta-row">
+      <div class="delta-model">Cartesia Sonic-3</div>
+      <div class="delta-overall">22.0%</div>
+      <div class="delta-hard" style="color: var(--yellow);">41.2% <span style="font-size:10px; color:var(--yellow);">▲+19.2</span></div>
+      <div class="delta-bar-wrap"><div class="delta-bar pos" style="width:48%;left:50%;"></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1px;height:100%;background:var(--border);"></div></div>
+    </div>
+    <!-- OpenAI: 41.5 → 42.2 +0.6 -->
+    <div class="delta-row">
+      <div class="delta-model">OpenAI gpt-4o-mini-tts</div>
+      <div class="delta-overall">41.5%</div>
+      <div class="delta-hard" style="color: var(--muted);">42.2% <span style="font-size:10px; color:var(--muted);">≈ flat</span></div>
+      <div class="delta-bar-wrap"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1px;height:100%;background:var(--border);"></div></div>
+    </div>
+    <!-- Azure: 48.6 → 48.1 -0.6 -->
+    <div class="delta-row">
+      <div class="delta-model">Azure Dragon HD Omni</div>
+      <div class="delta-overall">48.6%</div>
+      <div class="delta-hard" style="color: var(--muted);">48.1% <span style="font-size:10px; color:var(--muted);">≈ flat</span></div>
+      <div class="delta-bar-wrap"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1px;height:100%;background:var(--border);"></div></div>
+    </div>
+    <!-- Grok: 61.9 → 50.6 -11.3 -->
+    <div class="delta-row">
+      <div class="delta-model">xAI Grok TTS</div>
+      <div class="delta-overall">61.9%</div>
+      <div class="delta-hard" style="color: var(--orange);">50.6% <span style="font-size:10px; color:var(--orange);">▼−11.3</span></div>
+      <div class="delta-bar-wrap"><div class="delta-bar neg" style="width:28%;"></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1px;height:100%;background:var(--border);"></div></div>
+    </div>
+    <!-- Fish: 42.4 → 9.7 -32.7 -->
+    <div class="delta-row">
+      <div class="delta-model">Fish Audio S2 Pro</div>
+      <div class="delta-overall">42.4%</div>
+      <div class="delta-hard" style="color: var(--red);">9.7% <span style="font-size:10px; color:var(--red);">▼−32.7</span></div>
+      <div class="delta-bar-wrap"><div class="delta-bar neg" style="width:82%;"></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1px;height:100%;background:var(--border);"></div></div>
+    </div>
+  </div>
+
+  <p>Three patterns emerge from this comparison that are not visible in the overall leaderboard.</p>
+
+  <p>First, <strong>Gemini is the only model that gets measurably better on alphanumeric content.</strong> Its win rate rises from 80.9% overall to 85.6% on the hardest alphanumeric sentences — an improvement of 4.7 points. Its 15 robotic-voice complaints from the broader dataset almost disappear on these sentences. Evaluators describe its number reading as "clear," "precise," and "easy to understand." This is not a coincidence — it is evidence of a deliberate training or post-processing choice to handle structured identifiers differently from prose.</p>
+
+  <p>Second, <strong>Fish Audio S2 Pro collapses on alphanumeric content in a way its overall win rate completely obscures.</strong> At 42.4% overall it sits in the middle of the field. On the eight high-alphanumeric sentences, it wins only 9.7% of decided matchups — a drop of 32.7 points. It goes 0-14 against ElevenLabs on <code>APL-RPR-NYC-2991X</code> and 0-14 against multiple opponents on other hard codes. A team building a customer support or IVR product who selected Fish Audio based on general leaderboard performance would encounter a model that fails repeatedly on the most common type of sentence their product needs to read.</p>
+
+  <p>Third, <strong>Grok drops 11 points on alphanumeric sentences</strong> despite being a strong general performer. Its mispronunciation count is the highest in the dataset overall (54 complaints), and that weakness is amplified on structured codes where correct pronunciation is binary — either right or wrong.</p>
+
+  <div class="callout">
+    <div class="callout-tag">Key finding</div>
+    <p>The overall leaderboard and the alphanumeric leaderboard are measuring different capabilities. A model competitive on natural prose can be nearly unusable on booking IDs and account numbers. The two rankings do not correlate for most models in this evaluation.</p>
+  </div>
+
+  <h2>Why Alphanumeric Content Breaks TTS Models</h2>
+
+  <p>The failures documented in this dataset share a structural cause. TTS models learn from text corpora where "207" almost always means the number two hundred and seven, "CHI" almost always refers to the Greek letter or city, "COMP" is almost always a word. These are correct priors for natural language. They are wrong priors for structured identifiers.</p>
+
+  <p>The model has no reliable signal for when it is reading natural language versus a code. The surrounding sentence may be prose — "your booking ID is confirmed" — but the identifier itself requires a completely different rendering logic: spell letters individually, read digits as single characters, do not merge adjacent numbers, do not apply phonetic rules to letter clusters.</p>
+
+  <p>Context clues help. The word "booking ID" before <code>HVAC-CHI-4351</code> should signal that what follows is a code, not a phrase. The word "account number" before <code>4147-9938-2210-6655</code> should signal digit-by-digit rendering. Some models clearly use these signals — Gemini's performance improvement on hard alphanumeric sentences suggests it does. Most do not do so reliably.</p>
+
+  <div class="quote">
+    <p>"The audio is clear and natural sounding. The pacing is good. The numbers in the address 1422 are said 'fourteen twenty-two' when they should be said individually as one, four, two, two for clarity. Also the characters in the ticket number COMP-PG-7766 are said as 'comp, P, G, seventy-seven sixty-six,' when they should also be said individually for clarity."</p>
+    <p>"Missing half the ACH trace number. Didn't say 77K2L9."</p>
+    <p>"The model mispronounces the account number USF-LIFE-44X2. At LIFE, the model tries to make it a word and says 'Lie ife,' instead of saying the letters individually. It also combines the numbers and says 'forty-four' when it should say four, four."</p>
+    <span class="quote-src">— Human evaluators, VoiceArena vote log</span>
+  </div>
+
+  <h2>The Commercial Stakes</h2>
+
+  <p>The use-case distribution of alphanumeric complaints is not uniform: 284 of 393 failures (72%) occurred in Customer Support sentences. This is where the stakes are highest. A customer calling to verify a credit card activation, confirm a delivery address change, or retrieve a case number is not listening to the model for its naturalness. They are listening for accuracy. A misread credit card number does not just fail a naturalness benchmark — it fails the task.</p>
+
+  <p>IVR systems, banking voice assistants, insurance claim notifications, e-commerce order confirmations — these are the applications driving the majority of current TTS commercial deployment. They are also the applications that require alphanumeric reading to be correct. The VoiceArena data shows that most current models are not reliable at this task.</p>
+
+  <p>The one model that improves on this content — Gemini — wins 85.6% of hard alphanumeric matchups and receives the fewest number-related complaints in the dataset (24, versus 93 for Fish Audio and 88 for Cartesia). For teams building in the customer support and IVR space, that gap is not a benchmark detail. It is the difference between a product that works and one that doesn't.</p>
+
+  <h2>What This Means for Model Builders</h2>
+
+  <p>The VoiceArena evaluation does not tell you how to fix alphanumeric rendering. But the human comments tell you with precision where your model is failing, on which specific strings, and in what way. That is a tractable target.</p>
+
+  <p>The four failure types — wrong rendering, digit merging, skipped content, and letters-as-words — each map to different points in the model's processing. Wrong rendering suggests the model is not detecting that a string is a code. Digit merging suggests the model's number-reading heuristics are applying when they should not. Skipped content suggests tokenisation or attention issues on long structured strings. Letters-as-words suggests the model is applying phonetic priors to character sequences.</p>
+
+  <p>Gemini's performance on these sentences is evidence that the problem is not fundamental to the architecture — it is a training and evaluation gap. A model trained to distinguish structured identifiers from prose, and evaluated on alphanumeric accuracy rather than just naturalness, can handle this content correctly most of the time. The evaluator comments in this dataset — 393 of them, describing specific strings and specific failure modes — are a direct guide to where that training data is missing.</p>
+
+  <div class="divider"></div>
+
+  <span class="section-label">Methodology</span>
+  <p style="font-size: 15px; color: var(--muted);">All data is drawn from VoiceArena's en-US vote log: 6,193 pairwise human evaluation votes across 7 models — Cartesia Sonic-3, ElevenLabs Eleven v3, Fish Audio S2 Pro, Google DeepMind Gemini 3.1 Flash TTS, Microsoft Azure Dragon HD Omni, OpenAI gpt-4o-mini-tts, and xAI Grok TTS. Alphanumeric complaint identification used keyword pattern-matching across 3,719 evaluator comments. Per-sentence analysis was based on 8 sentences generating 10+ alphanumeric-related comments each. Model win rates on high-alphanumeric sentences were calculated from all matchups involving those sentences, excluding ties. Overall win rates exclude ties across all 6,193 votes. Full leaderboard and methodology at <a href="https://voicearena.com">voicearena.com</a>.</p>
+
+</div>
+
+<div class="footer">
+  <div class="footer-brand">VoiceArena · Josh Talks AI · June 2026</div>
+  <p>VoiceArena builds the measurement layer for voice AI — human-rated pairwise evaluation of text-to-speech models across languages, use cases, and failure modes. Leaderboards, methodology, and data at <a href="https://voicearena.com">voicearena.com</a>.</p>
+</div>
+
+</body>
+</html>
